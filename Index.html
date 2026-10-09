@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#11111d">
+  <meta name="description" content="Respondé 10 preguntas y descubrí qué tipo de mente te caracteriza. Hacé el test de personalidad y compartí tu resultado.">
+  <title>¿Qué tipo de mente tenés? | MenteQuiz</title>
+
+  <style>
+    :root {
+      --fondo: #11111d;
+      --panel: #1c1c2d;
+      --texto: #f5f3ff;
+      --suave: #b7b5cc;
+      --acento: #b9a2ff;
+      --borde: #37354e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at top, #292044 0%, transparent 55%),
+        var(--fondo);
+      color: var(--texto);
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+
+    .contenedor {
+      width: min(100% - 32px, 650px);
+      margin: auto;
+      padding: 36px 0 24px;
+    }
+
+    header { text-align: center; margin-bottom: 28px; }
+
+    .etiqueta {
+      color: var(--acento);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 3px;
+    }
+
+    h1 {
+      font-size: clamp(30px, 7vw, 46px);
+      line-height: 1.15;
+      margin: 12px 0;
+    }
+
+    .subtitulo { color: var(--suave); margin: 0; }
+
+    .panel {
+      background: rgba(28, 28, 45, .96);
+      border: 1px solid var(--borde);
+      border-radius: 22px;
+      padding: clamp(20px, 5vw, 32px);
+      box-shadow: 0 18px 60px #0003;
+    }
+
+    .oculto { display: none !important; }
+
+    .boton {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 13px;
+      padding: 14px 18px;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+      text-align: center;
+      transition: transform .15s, background .15s;
+    }
+
+    .boton:active { transform: scale(.98); }
+
+    .principal { background: var(--acento); color: #191326; }
+    .secundario {
+      background: #29283e;
+      color: var(--texto);
+      border: 1px solid var(--borde);
+      margin-top: 10px;
+    }
+
+    .pequeno { color: var(--suave); font-size: 13px; }
+
+    .barra-fondo {
+      background: #35334a;
+      height: 7px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 12px 0 22px;
+    }
+
+    #barra {
+      height: 100%;
+      width: 0;
+      background: var(--acento);
+      transition: width .25s;
+    }
+
+    .fila {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--suave);
+      font-size: 13px;
+    }
+
+    #pregunta {
+      font-size: 23px;
+      line-height: 1.35;
+      margin: 0 0 20px;
+    }
+
+    #opciones { display: grid; gap: 10px; }
+
+    .opcion {
+      background: #242339;
+      border: 1px solid #45415f;
+      color: var(--texto);
+      border-radius: 13px;
+      padding: 14px;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .opcion:hover, .opcion:focus-visible {
+      border-color: var(--acento);
+      background: #302b49;
+      outline: none;
+    }
+
+    .resultado-icono { font-size: 48px; margin: 4px 0; }
+    #resultado-titulo { font-size: 30px; margin: 0 0 10px; }
+    #resultado-descripcion { color: var(--suave); }
+
+    .aviso {
+      border-top: 1px solid var(--borde);
+      padding-top: 16px;
+      margin-top: 22px;
+      font-size: 12px;
+      color: var(--suave);
+    }
+
+    footer {
+      color: var(--suave);
+      font-size: 12px;
+      text-align: center;
+      padding: 22px 0;
+    }
+
+    button:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="contenedor">
+    <header>
+      <div class="etiqueta">MENTEQUIZ · TEST DE PERSONALIDAD</div>
+      <h1>¿Qué tipo de mente tenés?</h1>
+      <p class="subtitulo">
+        Diez preguntas. Cuatro perfiles. Descubrí cuál se parece más a vos.
+      </p>
+    </header>
+
+    <section id="inicio" class="panel">
+      <h2>Conocé tu forma de pensar</h2>
+      <p>
+        ¿Analizás cada detalle, buscás nuevas experiencias,
+        observás a las personas o imaginás posibilidades?
+      </p>
+      <p class="pequeno">
+        No hay respuestas correctas o incorrectas. Elegí lo que
+        más se acerque a tu forma habitual de actuar.
+      </p>
+      <button class="boton principal" id="comenzar">Empezar el test →</button>
+    </section>
+
+    <section id="juego" class="panel oculto" aria-live="polite">
+      <div class="fila">
+        <span id="contador">Pregunta 1 de 10</span>
+        <span id="porcentaje">10 %</span>
+      </div>
+      <div
+        class="barra-fondo"
+        role="progressbar"
+        aria-label="Progreso del test"
+        aria-valuemin="0"
+        aria-valuemax="10"
+        aria-valuenow="0"
+        id="progreso"
+      >
+        <div id="barra"></div>
+      </div>
+      <h2 id="pregunta"></h2>
+      <div id="opciones"></div>
+      <p class="pequeno">Elegí una opción para continuar.</p>
+    </section>
+
+    <section id="resultado" class="panel oculto" aria-live="polite">
+      <div class="etiqueta">TU RESULTADO</div>
+      <div id="resultado-icono" class="resultado-icono"></div>
+      <h2 id="resultado-titulo"></h2>
+      <p id="resultado-descripcion"></p>
+      <p id="resultado-secundario" class="pequeno"></p>
+      <button class="boton principal" id="compartir">
+        Compartir mi resultado ↗
+      </button>
+      <button class="boton secundario" id="repetir">
+        Volver a hacer el test
+      </button>
+      <p class="aviso">
+        Este test es recreativo. No es un diagnóstico ni una prueba
+        científica de personalidad. Las respuestas se procesan en
+        tu navegador y no se envían a una base de datos.
+      </p>
+    </section>
+
+    <footer>
+      MenteQuiz · Un test para conocerte un poco más.
+    </footer>
+  </main>
+
+  <script>
+    const perfiles = {
+      estratega: {
+        nombre: "El estratega",
+        icono: "♟️",
+        descripcion:
+          "Te gusta analizar las situaciones, anticipar problemas y pensar antes de actuar. Solés buscar explicaciones y comparar opciones antes de decidir. Tu desafío puede ser aceptar que no todo se puede prever."
+      },
+      explorador: {
+        nombre: "El explorador",
+        icono: "🧭",
+        descripcion:
+          "Te atrae descubrir cosas, probar caminos nuevos y aprender mediante la experiencia. La curiosidad suele impulsarte a moverte. Tu desafío puede ser mantener el rumbo cuando aparece algo nuevo que llama tu atención."
+      },
+      observador: {
+        nombre: "El observador",
+        icono: "👁️",
+        descripcion:
+          "Prestás atención a los detalles, los comportamientos y el ambiente. Antes de sacar conclusiones, preferís mirar y comprender lo que ocurre. Tu desafío puede ser expresar lo que pensás en vez de quedarte solo observando."
+      },
+      creador: {
+        nombre: "El creador",
+        icono: "💡",
+        descripcion:
+          "Te gusta imaginar alternativas, relacionar ideas y pensar en lo que todavía no existe. Disfrutás encontrar otras formas de resolver las cosas. Tu desafío puede ser convertir algunas de esas ideas en proyectos concretos."
+      }
+    };
+
+    const preguntas = [
+      {
+        texto: "1. Te presentan un problema difícil. ¿Qué hacés primero?",
+        opciones: [
+          ["Lo divido en partes y busco una solución lógica.", "estratega"],
+          ["Pruebo algo diferente para ver qué sucede.", "explorador"],
+          ["Observo los detalles para entender qué está pasando.", "observador"],
+          ["Imagino varias soluciones posibles.", "creador"]
+        ]
+      },
+      {
+        texto: "2. ¿Qué actividad te llama más la atención?",
+        opciones: [
+          ["Resolver acertijos o planificar una estrategia.", "estratega"],
+          ["Explorar un lugar o aprender algo nuevo.", "explorador"],
+          ["Observar cómo piensan y actúan las personas.", "observador"],
+          ["Inventar una historia, diseño o proyecto.", "creador"]
+        ]
+      },
+      {
+        texto: "3. En un grupo nuevo, normalmente...",
+        opciones: [
+          ["Intento entender qué conviene hacer.", "estratega"],
+          ["Me animo a participar y conocer gente.", "explorador"],
+          ["Escucho y observo antes de hablar.", "observador"],
+          ["Pienso en ideas para aportar a la conversación.", "creador"]
+        ]
+      },
+      {
+        texto: "4. Cuando algo no sale como esperabas...",
+        opciones: [
+          ["Reviso qué falló y cambio el plan.", "estratega"],
+          ["Improviso y busco otra oportunidad.", "explorador"],
+          ["Intento detectar qué detalle pasé por alto.", "observador"],
+          ["Busco una solución que nadie haya probado.", "creador"]
+        ]
+      },
+      {
+        texto: "5. ¿Qué te gustaría dominar mejor?",
+        opciones: [
+          ["Tomar decisiones y planificar.", "estratega"],
+          ["Adaptarme a situaciones desconocidas.", "explorador"],
+          ["Comprender mejor a las personas.", "observador"],
+          ["Crear cosas originales.", "creador"]
+        ]
+      },
+      {
+        texto: "6. Tenés una tarde completamente libre. ¿Qué elegís?",
+        opciones: [
+          ["Aprender algo que me ayude a mejorar.", "estratega"],
+          ["Salir o hacer algo que nunca hice.", "explorador"],
+          ["Leer, escuchar o mirar algo con atención.", "observador"],
+          ["Trabajar en una idea propia.", "creador"]
+        ]
+      },
+      {
+        texto: "7. ¿Qué te molesta más al resolver algo?",
+        opciones: [
+          ["Tomar una decisión sin información suficiente.", "estratega"],
+          ["Tener que repetir siempre lo mismo.", "explorador"],
+          ["Que nadie preste atención a los detalles.", "observador"],
+          ["Que no permitan probar ideas diferentes.", "creador"]
+        ]
+      },
+      {
+        texto: "8. Cuando aprendés una habilidad nueva...",
+        opciones: [
+          ["Busco un método y sigo los pasos.", "estratega"],
+          ["Aprendo haciendo y experimentando.", "explorador"],
+          ["Primero miro cómo lo hacen los demás.", "observador"],
+          ["Intento encontrar mi propia manera.", "creador"]
+        ]
+      },
+      {
+        texto: "9. ¿Qué papel preferís en un proyecto?",
+        opciones: [
+          ["Organizar las tareas y anticipar dificultades.", "estratega"],
+          ["Poner las cosas en marcha y probar.", "explorador"],
+          ["Revisar el trabajo y detectar problemas.", "observador"],
+          ["Proponer conceptos e ideas originales.", "creador"]
+        ]
+      },
+      {
+        texto: "10. ¿Cuál de estas frases se acerca más a vos?",
+        opciones: [
+          ["Antes de actuar, prefiero entender el panorama.", "estratega"],
+          ["Muchas respuestas aparecen al intentarlo.", "explorador"],
+          ["Los pequeños detalles pueden revelar mucho.", "observador"],
+          ["Siempre hay otra forma de imaginar las cosas.", "creador"]
+        ]
+      }
+    ];
+
+    const inicio = document.getElementById("inicio");
+    const juego = document.getElementById("juego");
+    const resultado = document.getElementById("resultado");
+    const pregunta = document.getElementById("pregunta");
+    const opciones = document.getElementById("opciones");
+    const barra = document.getElementById("barra");
+    const progreso = document.getElementById("progreso");
+
+    let numero = 0;
+    let puntos = {};
+
+    function reiniciarPuntos() {
+      puntos = {
+        estratega: 0,
+        explorador: 0,
+        observador: 0,
+        creador: 0
+      };
+    }
+
+    function mostrar(seccion) {
+      inicio.classList.add("oculto");
+      juego.classList.add("oculto");
+      resultado.classList.add("oculto");
+      seccion.classList.remove("oculto");
+    }
+
+    function comenzar() {
+      numero = 0;
+      reiniciarPuntos();
+      mostrar(juego);
+      mostrarPregunta();
+    }
+
+    function mostrarPregunta() {
+      const actual = preguntas[numero];
+      const respondidas = numero;
+
+      document.getElementById("contador").textContent =
+        `Pregunta ${numero + 1} de ${preguntas.length}`;
+
+      document.getElementById("porcentaje").textContent =
+        `${Math.round(respondidas / preguntas.length * 100)} %`;
+
+      barra.style.width =
+        `${respondidas / preguntas.length * 100}%`;
+
+      progreso.setAttribute("aria-valuenow", respondidas);
+      pregunta.textContent = actual.texto;
+      opciones.replaceChildren();
+
+      actual.opciones.forEach(([texto, perfil]) => {
+        const boton = document.createElement("button");
+        boton.className = "opcion";
+        boton.type = "button";
+        boton.textContent = texto;
+
+        boton.addEventListener("click", () => {
+          puntos[perfil]++;
+          numero++;
+
+          if (numero < preguntas.length) {
+            mostrarPregunta();
+          } else {
+            mostrarResultado();
+          }
+        });
+
+        opciones.appendChild(boton);
+      });
+    }
+
+    function mostrarResultado() {
+      const orden = Object.keys(puntos).sort(
+        (a, b) => puntos[b] - puntos[a]
+      );
+
+      const ganador = perfiles[orden[0]];
+      const segundo = perfiles[orden[1]];
+
+      mostrar(resultado);
+      document.getElementById("resultado-icono").textContent =
+        ganador.icono;
+      document.getElementById("resultado-titulo").textContent =
+        ganador.nombre;
+      document.getElementById("resultado-descripcion").textContent =
+        ganador.descripcion;
+      document.getElementById("resultado-secundario").textContent =
+        `Tu segundo perfil más destacado: ${segundo.nombre}.`;
+
+      barra.style.width = "100%";
+      progreso.setAttribute("aria-valuenow", preguntas.length);
+    }
+
+    async function compartir() {
+      const titulo = document.getElementById("resultado-titulo").textContent;
+      const texto = `Hice el test "¿Qué tipo de mente tenés?" y mi resultado es ${titulo}. ¿Cuál será el tuyo?`;
+
+      const datos = {
+        title: "Mi resultado en MenteQuiz",
+        text: texto,
+        url: window.location.href
+      };
+
+      try {
+        if (navigator.share) {
+          await navigator.share(datos);
+        } else if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(
+            `${texto}\n${window.location.href}`
+          );
+          alert("¡Copiaste tu resultado y el enlace!");
+        } else {
+          prompt(
+            "Copiá este texto para compartir tu resultado:",
+            `${texto}\n${window.location.href}`
+          );
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          alert("No se pudo abrir la opción de compartir. Probá copiar el enlace de la barra del navegador.");
+        }
+      }
+    }
+
+    document.getElementById("comenzar")
+      .addEventListener("click", comenzar);
+
+    document.getElementById("repetir")
+      .addEventListener("click", comenzar);
+
+    document.getElementById("compartir")
+      .addEventListener("click", compartir);
+
+    reiniciarPuntos();
+  </script>
+</body>
+    </html>
+  
